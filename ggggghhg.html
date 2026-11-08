@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auter's Meme Archive</title>
+<style>
+:root{--bg:#101116;--panel:#1b1d26;--text:#f2f2f4;--muted:#a7a9b4;--accent:#b7c8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:34px 22px 22px;max-width:1100px;margin:auto}h1{font-size:clamp(26px,5vw,42px);margin:0 0 6px}header p{color:var(--muted);margin:0}
+main{max-width:1100px;margin:auto;padding:0 22px 50px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}input,select{background:var(--panel);color:var(--text);border:1px solid #343744;border-radius:12px;padding:11px 13px;font:inherit}input{flex:1;min-width:190px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:13px}
+.card{background:var(--panel);border:1px solid #292c36;border-radius:15px;overflow:hidden;cursor:pointer;transition:transform .15s}.card:hover{transform:translateY(-3px)}
+.card img{width:100%;height:175px;object-fit:contain;background:#0b0c10;display:block}.meta{padding:10px 12px}.name{font-weight:650}.tags{font-size:12px;color:var(--muted);margin-top:3px}
+footer{color:var(--muted);font-size:12px;padding:26px 0 0}
+dialog{width:min(94vw,900px);max-height:92vh;background:#111218;color:var(--text);border:1px solid #454957;border-radius:16px;padding:12px}dialog::backdrop{background:#000c}dialog img{display:block;max-width:100%;max-height:75vh;margin:auto;object-fit:contain}.close{float:right;background:#292c36;color:white;border:0;border-radius:9px;padding:8px 12px;font-size:16px}
+.empty{color:var(--muted);padding:30px 0}
+</style></head><body>
+<header><h1>Auter's Meme Archive</h1><p>一些雪豹、猫、人物，以及无法归类的反应。</p></header>
+<main>
+<div class="controls"><input id="q" placeholder="搜索名字或情绪…"><select id="cat"><option value="">全部分类</option></select></div>
+<section class="grid" id="grid"></section><div class="empty" id="empty" hidden>没有找到匹配的表情包。</div>
+<footer>个人表情包收藏 · 点击图片查看原图。此页面公开后，任何拥有链接的人都可以访问图片。</footer>
+</main>
+<dialog id="viewer"><button class="close" id="close">关闭 ✕</button><img id="full" alt=""><div class="meta"><div class="name" id="fulltitle"></div><div class="tags" id="fulltags"></div><a id="original" style="color:var(--accent)" target="_blank" rel="noopener">打开原图</a></div></dialog>
+<script>
+const items=[{"file": "01-吐舌雪豹.jpeg", "title": "吐舌雪豹", "category": "雪豹", "tags": "放空、搞怪"}, {"file": "02-严肃小鸡.png", "title": "严肃小鸡", "category": "动物", "tags": "认真、审视"}, {"file": "03-发光文件.jpeg", "title": "发光文件", "category": "反应", "tags": "惊喜、感动"}, {"file": "04-举爪雪豹.jpeg", "title": "举爪雪豹", "category": "雪豹", "tags": "无辜、求助"}, {"file": "05-爱心雪豹.jpeg", "title": "爱心雪豹", "category": "雪豹", "tags": "喜欢、撒娇"}, {"file": "06-侧脸帅哥.jpeg", "title": "侧脸帅哥", "category": "人物", "tags": "欣赏、沉思"}, {"file": "07-黄色小人.jpeg", "title": "黄色小人", "category": "反应", "tags": "思考、观察"}, {"file": "08-帅哥侧目.jpeg", "title": "帅哥侧目", "category": "人物", "tags": "嫌弃、忍笑"}, {"file": "09-半睁眼小人.png", "title": "半睁眼小人", "category": "角色", "tags": "无语、淡定"}, {"file": "10-蓝色雪豹.jpeg", "title": "蓝色雪豹", "category": "雪豹", "tags": "凝视、压迫感"}, {"file": "11-鬼脑意赢.jpeg", "title": "鬼脑意赢", "category": "动物", "tags": "胡思乱想"}, {"file": "12-显微镜猛男.jpeg", "title": "显微镜猛男", "category": "人物", "tags": "审视、认真"}, {"file": "13-躺平雪豹.jpeg", "title": "躺平雪豹", "category": "雪豹", "tags": "无辜、撒娇"}, {"file": "14-大嘴生物.png", "title": "大嘴生物", "category": "抽象", "tags": "迷惑、傻笑"}, {"file": "15-绘画雪豹.png", "title": "绘画雪豹", "category": "雪豹", "tags": "认真、举爪"}, {"file": "16-打铁人.jpeg", "title": "打铁人", "category": "人物", "tags": "努力工作"}, {"file": "17-雪豹伸爪.jpeg", "title": "雪豹伸爪", "category": "雪豹", "tags": "请求、互动"}, {"file": "18-小猫魔法师.png", "title": "小猫魔法师", "category": "角色", "tags": "开心、卖萌"}, {"file": "19-蓝色崩溃脸.jpeg", "title": "蓝色崩溃脸", "category": "反应", "tags": "崩溃、痛苦"}, {"file": "20-长舌猫.jpeg", "title": "长舌猫", "category": "动物", "tags": "搞怪、放空"}, {"file": "21-雪豹粗眉.jpeg", "title": "雪豹粗眉", "category": "雪豹", "tags": "生气、认真"}, {"file": "22-隔屏摸爪.jpeg", "title": "隔屏摸爪", "category": "雪豹", "tags": "靠近、互动"}, {"file": "23-横躺雪豹.jpeg", "title": "横躺雪豹", "category": "雪豹", "tags": "求关注"}, {"file": "24-严肃表情.png", "title": "严肃表情", "category": "人物", "tags": "冷静、审视"}, {"file": "25-回头人物.png", "title": "回头人物", "category": "人物", "tags": "回头、震惊"}, {"file": "26-开心举文件.jpeg", "title": "开心举文件", "category": "人物", "tags": "庆祝、开心"}, {"file": "27-雪豹掏枪.jpeg", "title": "雪豹掏枪", "category": "雪豹", "tags": "威胁、警告"}, {"file": "28-雪豹正脸.jpeg", "title": "雪豹正脸", "category": "雪豹", "tags": "凝视、严肃"}, {"file": "29-举爪雪豹插画.jpeg", "title": "举爪雪豹插画", "category": "雪豹", "tags": "礼貌、请求"}, {"file": "30-黑猫小动图.gif", "title": "黑猫小动图", "category": "动物", "tags": "出场、打招呼"}];
+const cats=[...new Set(items.map(x=>x.category))];const cat=document.querySelector('#cat');
+cats.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;cat.append(o)});
+const grid=document.querySelector('#grid'),q=document.querySelector('#q'),empty=document.querySelector('#empty');
+function render(){let term=q.value.trim().toLowerCase(),c=cat.value;grid.innerHTML='';let shown=items.filter(x=>(!c||x.category===c)&&(!term||(x.title+x.category+x.tags).toLowerCase().includes(term)));
+shown.forEach(x=>{let el=document.createElement('article');el.className='card';let im=document.createElement('img');im.src=x.file;im.alt=x.title;im.loading='lazy';let m=document.createElement('div');m.className='meta';let n=document.createElement('div');n.className='name';n.textContent=x.title;let t=document.createElement('div');t.className='tags';t.textContent=x.category+' · '+x.tags;m.append(n,t);el.append(im,m);el.onclick=()=>openItem(x);grid.append(el)});empty.hidden=shown.length>0}
+function openItem(x){let d=document.querySelector('#viewer'),im=document.querySelector('#full');im.src=x.file;im.alt=x.title;document.querySelector('#fulltitle').textContent=x.title;document.querySelector('#fulltags').textContent=x.category+' · '+x.tags;document.querySelector('#original').href=x.file;d.showModal()}
+q.oninput=render;cat.onchange=render;document.querySelector('#close').onclick=()=>document.querySelector('#viewer').close();render();
+</script></body></html>
